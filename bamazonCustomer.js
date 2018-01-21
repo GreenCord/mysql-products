@@ -21,11 +21,37 @@ connection.connect(function(err) {
 
 
 function start() {
-	// inquirer message - choose department
+	console.log('Starting session...');
+	// get departments from db:
+	
+	connection.query('SELECT department_id, department_name FROM departments',(err,res)=>{
+		var depts = [];
+		depts.push('0: All Departments');
+		for (var i = 0; i < res.length; i++) {
+			depts.push(res[i].department_id + ': ' + res[i].department_name);
+		}
+		var quitID = res.length+1;
+		depts.push(quitID + ': Quit');
+		// console.log(depts);
+
+		// inquirer message - choose department or quit
+		inquirer.prompt({
+			name: 'dept',
+			type: 'list',
+			message: 'Display products from:',
+			choices: depts
+		}).then((ans)=>{
+			var arr = ans.dept.split(':');
+			var id = arr[0];
+			console.log('Dept chosen:',id);
+
+		});
 	// promise returned - list products from department & go to placeOrder
+	});
 }
 
 function placeOrder() {
+	console.log('Attempting to place order...');
 	// inquirer message - get user's input for item_id and quantity to purchase
 	// promise returned - check database quantities, if insufficient - error to user, else update db and display order total
 	// go back to start
