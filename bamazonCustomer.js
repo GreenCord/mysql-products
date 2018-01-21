@@ -119,11 +119,28 @@ function placeOrder(where) {
 			}
 		])
 		.then((ans)=>{
+			// promise returned - check database quantities, if insufficient - error to user, else update db and display order total
 			console.log('You want to buy ' + ans.quantity + ' of Item No. ' + ans.item + '.');
-			start();
+			// get db reference to item no.
+			var dbref;
+			for (var i = 0; i < res.length; i++) {
+				// console.log('Comparing db to ans: ' + ans.item + ':' + res[i].product_id);
+				if(res[i].product_id === parseInt(ans.item)) {
+					dbref = res[i];
+				}
+			}
+			// console.log('dbref:',dbref);
+			if (parseInt(ans.quantity) < parseInt(dbref.quantity)) {
+				console.log('There is enough available to place an order.');
+				start();
+			} else {
+				console.log('Sorry, there is not enough of that item to fulfill an order of that quantity.');
+				start();
+			}
+			// go back to start
+	
 		});
-	// promise returned - check database quantities, if insufficient - error to user, else update db and display order total
-	// go back to start
+	
 	});
 	// inquirer message - get user's input for item_id and quantity to purchase
 
