@@ -130,12 +130,80 @@ function replenishProduct(query){
 		});
 }
 
-function addNewProduct(query){}
+
+function addNewProduct(query){
+	console.log(query);
+		connection.query(query,(err,res)=>{
+			if (err) throw err;
+			inquirer
+				.prompt([
+					{
+						name: 'dept',
+						type: 'list',
+						message: 'Select the department to add a product:',
+						choices: function(){
+							var choicesArr = [''];
+							for (var i = 0; i < res.length; i++) {
+								var string = res[i].department_id + ': ' + res[i].department_name;
+								if (choicesArr.indexOf(string) < 0) {
+									choicesArr.push(string);
+								}
+							}
+							return choicesArr;
+						}
+					},
+					{
+						name: 'productName',
+						type: 'input',
+						message: 'Enter the name of the product:'
+					},
+					{
+						name: 'initialQuantity',
+						type: 'input',
+						message: 'Enter the initial quantity of the product:',
+						validate: function(value){
+							var isok = /^\d*$/.test(value);
+							if (isok) {
+								return true;
+							}
+							return 'Please enter the ID number of the product you want to purchase.';
+						}
+					},
+					{
+						name: 'price',
+						type: 'input',
+						message: 'Enter the retail price:',
+						validate: function(value){
+							var isdollaramt = /^\d+(?:\.\d{0,2})$/.test(value);
+							if (isdollaramt) {
+								return true;
+							}
+							return 'Please enter a dollar amount.';
+						}
+					}
+				])
+				.then((ans)=>{
+					console.log('Debug: You want to do stuff.',JSON.stringify(ans,null,2));
+				});
+	});
+	
+	// connection.query(query,(err,res)=>{
+	// 	if (err) throw err;
+	// 	console.log('You are adding a new product to the list. Let\'s begin:');
+	// 	inquirer
+	// 		.prompt([
+	// 			{}
+	// 		])
+	// 		.then((ans)=>{
+
+	// 		});
+	// });
+}
 
 var where = '';
 var query = '';
 function updateQuery(where){
-  query  = 'SELECT product_list.product_id, quantity, product_name, product_desc, price, departments.department_name ';
+  query  = 'SELECT product_list.product_id, quantity, product_name, product_desc, price, departments.department_name, departments.department_id ';
 	query += 'FROM product_list ';
 	query += 'INNER JOIN products ON (product_list.product_id = products.product_id) ';
 	query += 'LEFT JOIN departments ON (products.department_id = departments.department_id) ';
@@ -174,11 +242,13 @@ function start(){
 				break;
 
 				case 'Add to Inventory':
+				  // pass '' for all products
 					updateQuery('');
 					replenishProduct(query);
 				break;
 
 				case 'Add New Product':
+					// pas '' for all products
 					updateQuery('');
 					addNewProduct(query);
 				break;
