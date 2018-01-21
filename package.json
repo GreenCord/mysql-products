@@ -1,0 +1,24 @@
+{
+  "name": "mysql-products",
+  "version": "1.0.0",
+  "description": "CLI application working with product catalog",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GreenCord/mysql-products.git"
+  },
+  "author": "Steven Martinez",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/GreenCord/mysql-products/issues"
+  },
+  "homepage": "https://github.com/GreenCord/mysql-products#readme",
+  "dependencies": {
+    "dotenv": "^4.0.0",
+    "inquirer": "^5.0.1",
+    "mysql": "^2.15.0"
+  }
+}
