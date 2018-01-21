@@ -20,16 +20,9 @@ connection.connect(function(err) {
 });
 
 
-function viewInventory(where){
-	var queryall  = 'SELECT product_list.product_id, quantity, product_name, product_desc, price, departments.department_name ';
-			queryall += 'FROM product_list ';
-			// queryall += where;
-			queryall += 'INNER JOIN products ON (product_list.product_id = products.product_id) ';
-			queryall += 'LEFT JOIN departments ON (products.department_id = departments.department_id) ';
-			queryall += where;
-			queryall += 'ORDER BY products.department_id, products.product_id;';
-
-	connection.query(queryall, (err,res) => {
+function viewInventory(query){
+	
+	connection.query(query, (err,res) => {
 		if (err) throw err;
 		if (res.length > 0) {
 			console.log('  ID |  Price | Quantity | Name');
@@ -64,11 +57,95 @@ function viewInventory(where){
 	});
 }
 
-function replenishProduct(){}
+function replenishProduct(query){
+	connection.query(query,(err,res)=>{
+		inquirer
+			.prompt([
+				{
+					name: 'item',
+					type: 'input',
+					message: 'Enter the ID of the product you want to replenish:',
+					validate: function(value){
+						var isok = /^\d*$/.test(value);
+						if (isok) {
+							return true;
+						}
+						return 'Please enter the ID number of the product you want to replenish.';
+					}
+				},
+				{
+					name: 'quantity',
+					type: 'input',
+					message: 'Enter the amount of stock you wish to add:',
+					validate: function(value){
+						var isok = /^\d*$/.test(value);
+						if (isok) {
+							return true;
+						}
+						return 'Please enter a numeric value of the quantity you want to buy.';
+					}
+				}
+			])
+			.then((ans)=>{
+				var dbref;
+				for (var i = 0; i < res.length; i++) {
+					// console.log('Comparing db to ans: ' + ans.item + ':' + res[i].product_id);
+					if(res[i].product_id === parseInt(ans.item)) {
+						dbref = res[i];
+					}
+				}
+				console.log('You are adding ' + ans.quantity + ' of ' + dbref.product_name + '.');
+				console.log('Old quantity: ' + dbref.quantity);
+				if (parseInt(ans.quantity) > 0) {
+					var newquantity = parseInt(dbref.quantity) + parseInt(ans.quantity);
+					var updateQuery = 'UPDATE product_list SET ? WHERE ?';
+					var updateQueryVars = 
+						[
+							{quantity: newquantity},
+							{product_id: dbref.product_id}
+						];
+					connection.query(updateQuery,updateQueryVars,(err)=>{
+						if (err) throw err;
+						console.log('Order placed successfully. New quantity: ' + newquantity);
+						inquirer
+							.prompt({
+								name: 'continue',
+								type: 'confirm',
+								message: 'Continue?'
+							})
+							.then((ans)=>{
+								if (ans.continue) {
+									start();
+								} else {
+									console.log('Thank you for managing Bamazon. Bye.');
+									connection.end();
+								}
+							});
+					});
+				} else {
+					console.log('Detected no quantity to add. No products replenished.');
+					start();
+				}
+			});
+		});
+}
 
-function addNewProduct(){}
+function addNewProduct(query){}
+
+var where = '';
+var query = '';
+function updateQuery(where){
+  query  = 'SELECT product_list.product_id, quantity, product_name, product_desc, price, departments.department_name ';
+	query += 'FROM product_list ';
+	query += 'INNER JOIN products ON (product_list.product_id = products.product_id) ';
+	query += 'LEFT JOIN departments ON (products.department_id = departments.department_id) ';
+	query += where;
+	query += 'ORDER BY products.department_id, products.product_id;';
+}
 
 function start(){
+
+
 	inquirer
 		.prompt({
 			name: 'action',
@@ -85,19 +162,25 @@ function start(){
 		.then((ans)=>{
 			switch (ans.action) {
 				case 'View Products for Sale':
-					viewInventory('');
+				  // pass '' for all products
+				  updateQuery('');
+					viewInventory(query);
 				break;
 
 				case 'View Low Inventory':
-					viewInventory('WHERE quantity < 1 ');
+					// pass WHERE statement for quantities less than a number
+					updateQuery('WHERE quantity < 5 ');
+					viewInventory(query);
 				break;
 
 				case 'Add to Inventory':
-					replenishProduct();
+					updateQuery('');
+					replenishProduct(query);
 				break;
 
 				case 'Add New Product':
-					addNewProduct();
+					updateQuery('');
+					addNewProduct(query);
 				break;
 
 				case 'Exit Application':
