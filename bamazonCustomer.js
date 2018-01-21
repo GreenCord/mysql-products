@@ -19,9 +19,11 @@ connection.connect(function(err) {
   start();
 });
 
+var grandTotal = 0;
 
 function start() {
 	console.log('Starting session...');
+	console.log('\033c');
 	// get departments from db:
 	
 	connection.query('SELECT department_id, department_name FROM departments',(err,res)=>{
@@ -47,9 +49,10 @@ function start() {
 			switch (id) {
 				case '0':
 					// pass no where into query
-					placeOrder(';');
+					placeOrder('');
 				break;
 				case 'Q':
+					console.log('\033c');
 					console.log('Thank you for shopping bamazon. Goodbye!');
 					connection.end();
 				break;
@@ -63,17 +66,17 @@ function start() {
 }
 
 function placeOrder(where) {
-	console.log('Attempting to place order...');
+	console.log('\033c');
 	// list products
 	var queryall  = 'SELECT product_list.product_id, quantity, product_name, product_desc, price, departments.department_name ';
 			queryall += 'FROM product_list ';
 			queryall += 'INNER JOIN products ON (product_list.product_id = products.product_id) ';
 			queryall += 'LEFT JOIN departments ON (products.department_id = departments.department_id)';
-			queryall += where;
-	console.log('Query:',queryall);
+			queryall += where + ';';
+	
 	connection.query(queryall, (err,res) => {
 		if (err) throw err;
-		console.log('ID | Price | Name');
+		console.log('  ID | Price | Name');
 		console.log('___________________________________________________________');
 		for (var i = 0; i < res.length; i++) {
 			var line = '';
@@ -123,7 +126,6 @@ function placeOrder(where) {
 		])
 		.then((ans)=>{
 			// promise returned - check database quantities, if insufficient - error to user, else update db and display order total
-			console.log('You want to buy ' + ans.quantity + ' of Item No. ' + ans.item + '.');
 			// get db reference to item no.
 			var dbref;
 			for (var i = 0; i < res.length; i++) {
@@ -132,6 +134,7 @@ function placeOrder(where) {
 					dbref = res[i];
 				}
 			}
+			console.log('You want to buy ' + ans.quantity + ' of ' + dbref.product_name + ' at ' + dbref.price + ' each.');
 			// console.log('dbref:',dbref);
 			if (parseInt(ans.quantity) < parseInt(dbref.quantity)) {
 				var newquantity = parseInt(dbref.quantity) - parseInt(ans.quantity);
@@ -144,6 +147,10 @@ function placeOrder(where) {
 				connection.query(updateQuery,updateQueryVars,(err)=>{
 					if (err) throw err;
 					console.log('Order placed successfully.');
+					var orderTotal = parseInt(ans.quantity) * parseFloat(dbref.price);
+					grandTotal += orderTotal;
+					console.log('Your total for this order is: $' + orderTotal.toFixed(2));
+					console.log('You have spent $' + grandTotal.toFixed(2) + ' on all orders in this session.');
 					inquirer
 						.prompt({
 							name: 'continue',

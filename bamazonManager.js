@@ -31,30 +31,34 @@ function viewInventory(where){
 
 	connection.query(queryall, (err,res) => {
 		if (err) throw err;
-		console.log('  ID |  Price | Quantity | Name');
-		console.log('___________________________________________________________');
-		for (var i = 0; i < res.length; i++) {
-			var line = '';
-			if (res[i].product_id <= 9) {
-				line += ' ' + res[i].product_id;
-			} else {
-				line += res[i].product_id;
+		if (res.length > 0) {
+			console.log('  ID |  Price | Quantity | Name');
+			console.log('___________________________________________________________');
+			for (var i = 0; i < res.length; i++) {
+				var line = '';
+				if (res[i].product_id <= 9) {
+					line += ' ' + res[i].product_id;
+				} else {
+					line += res[i].product_id;
+				}
+				line += ' | ';
+				if (res[i].price < 10) {
+					line += '$ ' + res[i].price.toFixed(2);
+				} else {
+					line += '$' + res[i].price.toFixed(2);
+				}
+				if (res[i].quantity < 10) {
+					line += ' |        ' + res[i].quantity;	
+				} else if (res[i].quantity < 100) {
+					line += ' |       ' + res[i].quantity;
+				} else {
+					line += ' |      ' + res[i].quantity;
+				}
+				line += ' | ' + res[i].department_name + '/' + res[i].product_name;
+				console.log('  ' + line);
 			}
-			line += ' | ';
-			if (res[i].price < 10) {
-				line += '$ ' + res[i].price.toFixed(2);
-			} else {
-				line += '$' + res[i].price.toFixed(2);
-			}
-			if (res[i].quantity < 10) {
-				line += ' |        ' + res[i].quantity;	
-			} else if (res[i].quantity < 100) {
-				line += ' |       ' + res[i].quantity;
-			} else {
-				line += ' |      ' + res[i].quantity;
-			}
-			line += ' | ' + res[i].department_name + '/' + res[i].product_name;
-			console.log('  ' + line);
+		} else {
+			console.log('No products to list for this option.');
 		}
 		start();
 	});
@@ -85,7 +89,7 @@ function start(){
 				break;
 
 				case 'View Low Inventory':
-					viewInventory('WHERE quantity < 5 ');
+					viewInventory('WHERE quantity < 1 ');
 				break;
 
 				case 'Add to Inventory':
