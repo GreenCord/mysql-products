@@ -89,7 +89,10 @@ function placeOrder(where) {
 				line += '$' + res[i].price.toFixed(2);
 			}
 			line += ' | ' + res[i].product_name;
-			console.log(line);
+			console.log('  ' + line);
+			console.log('  ' + res[i].product_desc);
+			console.log('___________________________________________________________');
+
 		}
 		inquirer
 		.prompt([
