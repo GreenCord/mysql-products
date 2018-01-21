@@ -131,11 +131,45 @@ function placeOrder(where) {
 			}
 			// console.log('dbref:',dbref);
 			if (parseInt(ans.quantity) < parseInt(dbref.quantity)) {
-				console.log('There is enough available to place an order.');
-				start();
+				var newquantity = parseInt(dbref.quantity) - parseInt(ans.quantity);
+				var updateQuery = 'UPDATE product_list SET ? WHERE ?';
+				var updateQueryVars = 
+					[
+						{quantity: newquantity},
+						{product_id: dbref.product_id}
+					];
+				connection.query(updateQuery,updateQueryVars,(err)=>{
+					if (err) throw err;
+					console.log('Order placed successfully.');
+					inquirer
+						.prompt({
+							name: 'continue',
+							type: 'confirm',
+							message: 'Continue shopping?'
+						})
+						.then((ans)=>{
+							if (ans.continue) {
+								start();
+							} else {
+								connection.end();
+							}
+						});
+				});
 			} else {
 				console.log('Sorry, there is not enough of that item to fulfill an order of that quantity.');
-				start();
+				inquirer
+					.prompt({
+						name: 'continue',
+						type: 'confirm',
+						message: 'Continue shopping?'
+					})
+					.then((ans)=>{
+						if (ans.continue) {
+							start();
+						} else {
+							connection.end();
+						}
+					});
 			}
 			// go back to start
 	
