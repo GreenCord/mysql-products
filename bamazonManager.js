@@ -158,6 +158,11 @@ function addNewProduct(query){
 						message: 'Enter the name of the product:'
 					},
 					{
+						name: 'productDesc',
+						type: 'input',
+						message: 'Enter a description of the product:'
+					},
+					{
 						name: 'initialQuantity',
 						type: 'input',
 						message: 'Enter the initial quantity of the product:',
@@ -183,7 +188,75 @@ function addNewProduct(query){
 					}
 				])
 				.then((ans)=>{
-					console.log('Debug: You want to do stuff.',JSON.stringify(ans,null,2));
+					// console.log('Debug: You want to do stuff.',JSON.stringify(ans,null,2));
+					
+					// get department id
+					var dept = ans.dept.split(':');
+					var deptid = dept[0];
+					// console.log('Adding product to department num: ',deptid);
+
+					// get unique product id
+					var productid = 1;
+					// console.log('Unique?',productid);
+					var unique = false;
+					var count = 0;
+					while (!unique) {
+						count = 0;
+						for (var i = 0; i < res.length; i++) {
+							if (productid === res[i].product_id) {
+								count++;
+							}
+						}
+						if (count === 0) {
+							// console.log('Unique.',productid);
+							unique = true;
+						} else {
+							productid++;
+						}
+					}
+					// console.log('Found unique produict id:',productid);
+					connection.beginTransaction(function(err) {
+					  if (err) { throw err; }
+					  connection.query(
+					  	'INSERT INTO products SET ?',
+					  	{
+								product_id: productid,
+								department_id: deptid,
+								product_name: ans.productName,
+								product_desc: ans.productDesc,
+								price: parseFloat(ans.price)
+							},
+					  	function (error, results, fields) {
+					    if (error) {return connection.rollback(function() {throw error;});
+					    }
+					 
+					    //var log = 'Post ' + results.insertId + ' added';
+					    console.log(ans.productName + '(@ $' + ans.price + ' per item)' + ' added to the system.');
+					 
+					    connection.query(
+					    	'INSERT INTO product_list SET ?',
+					    	{
+									product_id: productid,
+									quantity: ans.initialQuantity
+								},
+					    	function (error, results, fields) {
+					      if (error) {return connection.rollback(function() {throw error;});
+					      }
+
+					      console.log('Inventory level for ' + ans.productName + ' set at ' + ans.initialQuantity + '.');
+
+					      connection.commit(function(err) {
+					        if (err) {
+					          return connection.rollback(function() {
+					            throw err;
+					          });
+					        }
+					        console.log('...product saved.');
+					        start();
+					      });
+					    });
+					  });
+					}); // end transaction
 				});
 	});
 	
