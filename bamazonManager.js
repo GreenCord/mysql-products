@@ -49,11 +49,13 @@ function viewInventory(query){
 				}
 				line += ' | ' + res[i].department_name + '/' + res[i].product_name;
 				console.log('  ' + line);
+				
 			}
+			start();
 		} else {
 			console.log('No products to list for this option.');
+			start();
 		}
-		start();
 	});
 }
 
