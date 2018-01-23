@@ -22,5 +22,6 @@ CREATE TABLE departments (
   department_id INT NOT NULL AUTO_INCREMENT,
   department_name VARCHAR(75) NULL,
   department_desc VARCHAR(255) NULL,
+  department_overhead DECIMAL(10,2) NULL,
   PRIMARY KEY (department_id)
 );
