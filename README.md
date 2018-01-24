@@ -4,15 +4,20 @@ Shop fresh. Shop at home. No need to even wear pants. You do need node.js instal
 
 ## Three Applications support Customers and Employees of Bamazon Fresh.
 
-1. bamazonCustomer.js
+### bamazonCustomer.js
+
 * List products from Bamazon Fresh. Place your order for whatever you want!
-1. bamazonManager.js
+
+### bamazonManager.js
+
 Manage products for Bamazon Fresh. You can view:
+
 * All Products for Sale
 * All Products Low in Inventory (less than 5 in stock)
 * Replenish inventory
 * Add new products
-1. bamazonSupervisor.js
+
+### bamazonSupervisor.js
 * Profit! View profit by departments, or add a whole new department.
 
 ## Installing
@@ -22,8 +27,11 @@ Manage products for Bamazon Fresh. You can view:
 1. Populate the ```products``` table with ```productsSeed.csv```.
 1. Populate the ```product_list``` table with ```product_listSeed.csv```.
 1. Now your ready to shop! Run one of the following commands to begin:
-* ```node bamazonCustomer.js```
-* ```node bamazonManager.js```
-* ```node bamazonSupervisor.js```
+
+```node bamazonCustomer.js```
+
+```node bamazonManager.js```
+
+```node bamazonSupervisor.js```
 
 Enjoy!
