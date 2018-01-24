@@ -68,7 +68,7 @@ function start() {
 function placeOrder(where) {
 	console.log('\033c');
 	// list products
-	var queryall  = 'SELECT product_list.product_id, quantity, product_name, product_desc, price, departments.department_name ';
+	var queryall  = 'SELECT product_list.product_id, product_sales, quantity, product_name, product_desc, price, departments.department_name ';
 			queryall += 'FROM product_list ';
 			queryall += 'INNER JOIN products ON (product_list.product_id = products.product_id) ';
 			queryall += 'LEFT JOIN departments ON (products.department_id = departments.department_id)';
@@ -138,16 +138,25 @@ function placeOrder(where) {
 			// console.log('dbref:',dbref);
 			if (parseInt(ans.quantity) < parseInt(dbref.quantity)) {
 				var newquantity = parseInt(dbref.quantity) - parseInt(ans.quantity);
+				var orderTotal = parseInt(ans.quantity) * parseFloat(dbref.price);
+				var productSales = parseFloat(dbref.product_sales) + orderTotal;
+				console.log('Debug productSales:',productSales.toFixed(2));
 				var updateQuery = 'UPDATE product_list SET ? WHERE ?';
 				var updateQueryVars = 
 					[
-						{quantity: newquantity},
-						{product_id: dbref.product_id}
+						{
+							quantity: newquantity,
+							product_sales: productSales
+						},
+						{
+							product_id: dbref.product_id
+						}
 					];
-				connection.query(updateQuery,updateQueryVars,(err)=>{
+				connection.query(updateQuery,updateQueryVars,(err,res)=>{
+					console.log('Debug res:',res);
 					if (err) throw err;
 					console.log('Order placed successfully.');
-					var orderTotal = parseInt(ans.quantity) * parseFloat(dbref.price);
+					
 					grandTotal += orderTotal;
 					console.log('Your total for this order is: $' + orderTotal.toFixed(2));
 					console.log('You have spent $' + grandTotal.toFixed(2) + ' on all orders in this session.');
@@ -161,6 +170,7 @@ function placeOrder(where) {
 							if (ans.continue) {
 								start();
 							} else {
+								console.log('Thank you for shopping bamazon. Bye.')
 								connection.end();
 							}
 						});

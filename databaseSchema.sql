@@ -3,10 +3,10 @@ CREATE DATABASE bamazon;
 USE bamazon;
 
 CREATE TABLE product_list (
-  item_id INT NOT NULL,
-  product_id INT NULL,
+  product_id INT NOT NULL,
   quantity INT NULL,
-  PRIMARY KEY (item_id)
+  product_sales DECIMAL(10,2) NULL,
+  PRIMARY KEY (product_id)
 );
 
 CREATE TABLE products (
