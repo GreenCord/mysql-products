@@ -26,6 +26,7 @@ Manage products for Bamazon Fresh. You can view:
 1. Set up the database using the provided ```databaseSchema.sql```.
 1. Populate the ```products``` table with ```productsSeed.csv```.
 1. Populate the ```product_list``` table with ```product_listSeed.csv```.
+1. Create a .env file with your SQL password in a variable: ```SQLPW = Y0UrAw3S0mePas5w0rd!``` 
 1. Now your ready to shop! Run one of the following commands to begin:
 
 ```node bamazonCustomer.js```
