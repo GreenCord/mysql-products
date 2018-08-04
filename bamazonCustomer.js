@@ -11,7 +11,8 @@ var connection = mysql.createConnection({
 
 	  // Your password
 	  password: process.env.SQLPW,
-	  database: "bamazon"
+	  database: "bamazon",
+	  insecureAuth: true
 	});
 
 connection.connect(function(err) {

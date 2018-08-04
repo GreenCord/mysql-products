@@ -1,5 +1,5 @@
 USE bamazon;
-INSERT INTO departments (department_name, department_desc)
+INSERT INTO departments (department_name, department_desc, department_overhead)
 VALUES
 ('Bakery','We have welcomed our carbohydrate overlords.',1000),
 ('Dairy','Locally sourced dairy and organic, pesticide-free, processed cheese foods.',2000),
